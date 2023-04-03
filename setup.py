@@ -14,7 +14,7 @@ OPTIONS = {
     'plist': {
         'LSUIElement': True,
     },
-    'packages': ['rumps', 'tomlkit'],
+    'packages': ['rumps'],
 }
 
 
