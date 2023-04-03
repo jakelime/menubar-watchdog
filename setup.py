@@ -7,7 +7,7 @@ Usage:
 
 from setuptools import setup
 
-APP = ['main.py']
+APP = ['ssWatchdog.py']
 DATA_FILES = []
 OPTIONS = {
     'argv_emulation': True,
