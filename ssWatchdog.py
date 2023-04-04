@@ -5,7 +5,7 @@ from config import Config
 from watcher import Watcher
 import time
 
-APP_NAME = "wtch"
+APP_NAME = "watchdog"
 VAR_RUN = True
 
 c = Config(APP_NAME)
@@ -80,7 +80,7 @@ class StatusBarApp(rumps.App):
 
 if __name__ == "__main__":
     # 📷
-    app = StatusBarApp("☇")
+    app = StatusBarApp(APP_NAME, icon="images/icon-white.icns")
     app.menu = [
         rumps.MenuItem("Watchdog App"),  # can specify an icon to be placed near text
         rumps.MenuItem("Debug", callback=app.debug_toggle_switch),

@@ -10,7 +10,7 @@ from watchdog.events import LoggingEventHandler
 
 from config import Config
 
-APP_NAME = "wtch"
+APP_NAME = "watchdog"
 c = Config(APP_NAME)
 cfg = c.cfg
 regex = re.compile(cfg["watcher_settings"]["regex_compile_string"])

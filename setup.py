@@ -8,9 +8,10 @@ Usage:
 from setuptools import setup
 
 APP = ['ssWatchdog.py']
-DATA_FILES = []
+DATA_FILES = [('', ['images'])]
 OPTIONS = {
     'argv_emulation': True,
+    'iconfile':'icon.icns',
     'plist': {
         'LSUIElement': True,
     },
