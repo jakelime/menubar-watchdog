@@ -94,10 +94,17 @@ class Config:
 
         cfg = {}
         cfg["watched_folders"] = {}
-        cfg["watched_folders"]["input"] = INPUT_FOLDER
 
+        input_folder = (
+            os.path.expanduser(INPUT_FOLDER) if "~" in INPUT_FOLDER else INPUT_FOLDER
+        )
+        cfg["watched_folders"]["input"] = input_folder
+
+        target_folder = (
+            os.path.expanduser(TARGET_FOLDER) if "~" in TARGET_FOLDER else TARGET_FOLDER
+        )
         cfg["output_folders"] = {}
-        cfg["output_folders"]["target"] = TARGET_FOLDER
+        cfg["output_folders"]["target"] = target_folder
 
         cfg["watcher_settings"] = {}
         cfg["watcher_settings"]["file_suffix"] = "png"
