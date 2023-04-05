@@ -6,7 +6,7 @@ import subprocess
 import platform
 import os
 
-APP_NAME = "wtch"
+APP_NAME = "ssWatchdog"
 
 
 class ConfigError(Exception):

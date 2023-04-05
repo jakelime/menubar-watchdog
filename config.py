@@ -1,7 +1,6 @@
 # config.py
 # Responsible for initializing configuration needed
-# for the application. There are 2 configurations here:
-# factory configuration and user configuration.
+# for the application.
 
 # global libraries
 import os
@@ -9,8 +8,15 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-APP_NAME = "wtch"
+APP_NAME = "ssWatchdog"
 # local libraries
+
+###############################
+#### User configurations ####
+###############################
+INPUT_FOLDER = "~/Desktop"
+TARGET_FOLDER = "~/Pictures/screenshots"
+################################
 
 
 class Config:
@@ -88,10 +94,10 @@ class Config:
 
         cfg = {}
         cfg["watched_folders"] = {}
-        cfg["watched_folders"]["input"] = "/Users/jli8/Desktop"
+        cfg["watched_folders"]["input"] = INPUT_FOLDER
 
         cfg["output_folders"] = {}
-        cfg["output_folders"]["target"] = "/Users/jli8/Pictures/screenshots"
+        cfg["output_folders"]["target"] = TARGET_FOLDER
 
         cfg["watcher_settings"] = {}
         cfg["watcher_settings"]["file_suffix"] = "png"
