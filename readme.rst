@@ -82,7 +82,6 @@ Change the actions you need when file changes are detected in ``watcher.py``
             )
             shutil.copyfile(src=fp, dst=new_fp)
             os.remove(fp)
-            log.info(f"moved {fp.name} to {new_fp.name}")
 
 
     class CustomEventHandler(LoggingEventHandler):

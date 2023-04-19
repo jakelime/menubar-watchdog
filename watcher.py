@@ -9,31 +9,39 @@ from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
 
 from config import Config
+from utils import cleanup_folder
 
 APP_NAME = "ssWatchdog"
-c = Config(APP_NAME)
-cfg = c.cfg
-regex = re.compile(cfg["watcher_settings"]["regex_compile_string"])
+cfg = Config().cfg
 log = logging.getLogger(APP_NAME)
+regex = re.compile(cfg["watcher_settings"]["regex_compile_string"])
 
 
 def check_and_move_file(filename: str):
+
     fp = Path(filename)
     if not fp.is_file():
         return
     match = re.match(regex, fp.name)
     if match is not None:
         sp = fp.stem.split(" ")
-        fp_date = sp[1]
+        fp_date = datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
         fp_time = datetime.strptime(" ".join(sp[3:5]), "%I.%M.%S %p").strftime(
             "%H%M%SH"
         )
-        new_fp = (
-            Path(cfg["output_folders"]["target"]) / f"ss-{fp_date}-{fp_time}{fp.suffix}"
-        )
-        shutil.copyfile(src=fp, dst=new_fp)
-        os.remove(fp)
-        log.info(f"moved {fp.name} to {new_fp.name}")
+        targetfolder = Path(cfg["output_folders"]["target"])
+        new_fp = targetfolder / f"ss-{fp_date}-{fp_time}{fp.suffix}"
+        try:
+            shutil.copyfile(src=fp, dst=new_fp)
+            os.remove(fp)
+            log.warning(f"moved {fp.name} to {new_fp.name}")
+        except FileNotFoundError:
+            pass
+
+        try:
+            cleanup_folder(targetfolder, clean_all=False)
+        except Exception as e:
+            log.error(e)
 
 
 class CustomEventHandler(LoggingEventHandler):
@@ -63,8 +71,7 @@ class CustomEventHandler(LoggingEventHandler):
 class Watcher:
     def __init__(self):
         self.log = logging.getLogger(APP_NAME)
-        self.log.info("watcher logger initialized")
-        self.cfg = c.cfg
+        self.cfg = Config().cfg
         self.event_handler = CustomEventHandler(logger=self.log)
 
         self.observer = Observer()
@@ -83,6 +90,7 @@ class Watcher:
 
 
 if __name__ == "__main__":
+
     wt = Watcher()
     try:
         wt.observer.start()

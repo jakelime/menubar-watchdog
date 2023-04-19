@@ -37,32 +37,28 @@ class Config:
 
     def __init__(
         self,
-        name="noname",
-        default_loglevel="INFO",
     ) -> None:
-
-        self.name = name
         self.user_docs = Path(os.path.expanduser("~/Documents/"))
-        self.user_wd = self.user_docs / f"_tools-{self.name}"
+        self.user_wd = self.user_docs / f"_tools-{APP_NAME}"
 
-        self.log = self.setup_logger(APP_NAME)
+        self.log = self.setup_logger()
         self.log.info("logger initialized")
 
         self.cfg = self.load_config()
         self.cfg = self.init_user_paths(self.cfg)
 
-    def setup_logger(self, app_name, default_loglevel="INFO"):
+    def setup_logger(self, default_loglevel="WARNING"):
         """
         Creates a logger object
         Logs to both console stdout and also a log file
         """
 
-        logger = logging.getLogger(app_name)
+        logger = logging.getLogger(APP_NAME)
 
         if logger.hasHandlers():
             return logger
 
-        self.logfile = self.user_wd / f"{self.name}.log"
+        self.logfile = self.user_wd / f"{APP_NAME}.log"
         if not self.logfile.is_file():
             self.logfile.parent.mkdir(parents=True, exist_ok=True)
             with self.logfile.open("w", encoding="utf-8") as f:
@@ -147,8 +143,7 @@ def pretty_print(d, n: int = 0):
 
 
 def main():
-    c = Config(APP_NAME)
-    cfg = c.cfg
+    cfg = Config().cfg
     pretty_print(cfg)
 
 

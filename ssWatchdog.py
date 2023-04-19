@@ -1,18 +1,17 @@
 import logging
+from pathlib import Path
 import rumps
 from threading import Thread, Event
 from config import Config
 from watcher import Watcher
 import time
+from utils import cleanup_folder
 
 APP_NAME = "ssWatchdog"
 VAR_RUN = True
 
-c = Config(APP_NAME)
-cfg = c.cfg
+cfg = Config().cfg
 log = logging.getLogger(APP_NAME)
-cfg["run"] = True
-
 
 class StatusBarApp(rumps.App):
     def __init__(self, *args, **kwargs):
@@ -32,19 +31,24 @@ class StatusBarApp(rumps.App):
             rumps.debug_mode(bool_value)
             log.info(f"switched debug={bool_value}")
 
+    def cleanup_folder(self, *args, **kwargs):
+        targetfolder = Path(cfg["output_folders"]["target"])
+        cleanup_folder(targetfolder, clean_all=True)
+
+
     def toggle_watchdog(self, sender=None):
         if sender is None:
             self.start_watchdog()
-            log.info(f"Started {self.watchdog=}")
+            log.critical(f"Started {APP_NAME}")
             return
 
         sender.state = not sender.state
         if sender.state == 1:
             self.stop_watchdog()
-            log.info(f"Stopped {self.watchdog=}")
+            log.critical(f"Stopped {APP_NAME}")
         else:
             self.start_watchdog()
-            log.info(f"Started {self.watchdog=}")
+            log.critical(f"Started {APP_NAME}")
 
     def watchdog(self, *args, **kwargs):
         wt = Watcher()
@@ -86,6 +90,7 @@ if __name__ == "__main__":
         rumps.MenuItem("Debug", callback=app.debug_toggle_switch),
         None,  # None functions as a separator in your menu
         rumps.MenuItem("Pause", callback=app.toggle_watchdog),
+        rumps.MenuItem("Cleanup", callback=app.cleanup_folder),
         None,
     ]
     app.run()
