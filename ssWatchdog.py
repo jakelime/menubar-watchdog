@@ -5,7 +5,7 @@ from threading import Thread, Event
 from config import Config
 from watcher import Watcher
 import time
-from utils import cleanup_folder
+from utils import cleanup_folder, open_folder
 
 APP_NAME = "ssWatchdog"
 VAR_RUN = True
@@ -34,6 +34,10 @@ class StatusBarApp(rumps.App):
     def cleanup_folder(self, *args, **kwargs):
         targetfolder = Path(cfg["output_folders"]["target"])
         cleanup_folder(targetfolder, clean_all=True)
+
+    def open_folder(self, *args, **kwargs):
+        targetfolder = Path(cfg["output_folders"]["target"])
+        open_folder(targetfolder)
 
 
     def toggle_watchdog(self, sender=None):
@@ -91,6 +95,7 @@ if __name__ == "__main__":
         None,  # None functions as a separator in your menu
         rumps.MenuItem("Pause", callback=app.toggle_watchdog),
         rumps.MenuItem("Cleanup", callback=app.cleanup_folder),
+        rumps.MenuItem("OpenFolder", callback=app.open_folder),
         None,
     ]
     app.run()
