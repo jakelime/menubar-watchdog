@@ -1,5 +1,7 @@
 # Screenshot watchdog
 
+Tested on python3.11.6
+
 Tired of countless screenshots on your desktop (MacOS)?
 
 -   OneDrive\'s \'auto transfer\' screeenshots is just bad!
