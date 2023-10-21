@@ -1,3 +1,4 @@
+import platform
 import logging
 from pathlib import Path
 import rumps
@@ -12,6 +13,7 @@ VAR_RUN = True
 
 cfg = Config().cfg
 log = logging.getLogger(APP_NAME)
+
 
 class StatusBarApp(rumps.App):
     def __init__(self, *args, **kwargs):
@@ -38,7 +40,6 @@ class StatusBarApp(rumps.App):
     def open_folder(self, *args, **kwargs):
         targetfolder = Path(cfg["output_folders"]["target"])
         open_folder(targetfolder)
-
 
     def toggle_watchdog(self, sender=None):
         if sender is None:
@@ -88,7 +89,16 @@ class StatusBarApp(rumps.App):
 
 if __name__ == "__main__":
     # 📷
-    app = StatusBarApp(APP_NAME, icon="images/icon-white.icns")
+    mac_version, _, _ = platform.mac_ver()
+    mac_major_version = int(mac_version.split(".")[0])
+
+    match mac_major_version:
+        case 14:
+            menu_icon_img = "images/icon-black.icns"
+        case _:
+            menu_icon_img = "images/icon-white.icns"
+
+    app = StatusBarApp(APP_NAME, icon=menu_icon_img)
     app.menu = [
         rumps.MenuItem("Watchdog App"),  # can specify an icon to be placed near text
         rumps.MenuItem("Debug", callback=app.debug_toggle_switch),
