@@ -18,17 +18,23 @@ regex = re.compile(cfg["watcher_settings"]["regex_compile_string"])
 
 
 def check_and_move_file(filename: str):
-
     fp = Path(filename)
     if not fp.is_file():
         return
     match = re.match(regex, fp.name)
     if match is not None:
         sp = fp.stem.split(" ")
+
+        # Version 0
+        # fp_date = datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
+        # fp_time = datetime.strptime(" ".join(sp[3:5]), "%I.%M.%S %p").strftime(
+        #     "%H%M%SH"
+        # )
+
+        # Version 1 - "Screenshot 2023-10-21 at 20.38.15.png"
         fp_date = datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
-        fp_time = datetime.strptime(" ".join(sp[3:5]), "%I.%M.%S %p").strftime(
-            "%H%M%SH"
-        )
+        fp_time = datetime.strptime(sp[3], "%H.%M.%S").strftime("%H%M%SH")
+
         targetfolder = Path(cfg["output_folders"]["target"])
         new_fp = targetfolder / f"ss-{fp_date}-{fp_time}{fp.suffix}"
         try:
@@ -52,7 +58,7 @@ class CustomEventHandler(LoggingEventHandler):
 
     def on_modified(self, event):
         super().on_modified(event)
-        time.sleep(1)
+        time.sleep(0.3)
         check_and_move_file(event.src_path)
 
     def on_moved(self, event):
@@ -90,7 +96,6 @@ class Watcher:
 
 
 if __name__ == "__main__":
-
     wt = Watcher()
     try:
         wt.observer.start()
