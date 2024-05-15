@@ -32,8 +32,15 @@ def check_and_move_file(filename: str):
         # )
 
         # Version 1 - "Screenshot 2023-10-21 at 20.38.15.png"
+        # Version 2 - "Screenshot 2024-05-15 at 10.08.40 PM.png"
+        fp_date = None
+        fp_time = None
         fp_date = datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
-        fp_time = datetime.strptime(sp[3], "%H.%M.%S").strftime("%H%M%SH")
+        for fmt in ["%H%M%SH", "%H%M%SH %p"]:
+            try:
+                fp_time = datetime.strptime(sp[3], "%H.%M.%S").strftime("%H%M%SH")
+            except Exception as e:
+                log.debug(f"{fmt=}, skipping to try another timefmt ({e=})")
 
         targetfolder = Path(cfg["output_folders"]["target"])
         new_fp = targetfolder / f"ss-{fp_date}-{fp_time}{fp.suffix}"
