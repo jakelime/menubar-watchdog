@@ -117,7 +117,10 @@ Change the actions you need when file changes are detected in ``watcher.py``
 Environments
 ================================================================
 
-MacOS only. Tested on Montery 12.6.3 with python 3.11.2.
+MacOS only.
+
+Tested on Apple Intel 12.6.3 with python 3.11
+Tested on Apple Silicon MacOS 14.4 with python 3.12
 
 .. code-block:: text
 
