@@ -14,7 +14,8 @@ APP_NAME = "ssWatchdog"
 ###############################
 #### User configurations ####
 ###############################
-INPUT_FOLDER = "~/Desktop"
+INPUT_FOLDER = "~/Desktop" #
+INPUT_FOLDER = "~/Downloads"
 TARGET_FOLDER = "~/Pictures/screenshots"
 ################################
 
