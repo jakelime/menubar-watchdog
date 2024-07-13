@@ -1,4 +1,3 @@
-import platform
 import time
 from pathlib import Path
 from threading import Event, Thread
@@ -25,6 +24,7 @@ lg = LoggerManager(APP_NAME).getLogger()
 class StatusBarApp(rumps.App):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.target_dir = Path(cfg["target_dir"]).expanduser()
         self.thread = None
         self.event = Event()
         self.toggle_watchdog()
@@ -41,12 +41,10 @@ class StatusBarApp(rumps.App):
             lg.info(f"switched debug={bool_value}")
 
     def cleanup_folder(self, *args, **kwargs):
-        targetfolder = Path(cfg["output_folders"]["target"])
-        cleanup_folder(targetfolder, clean_all=True)
+        cleanup_folder(self.target_dir, clean_all=True)
 
     def open_folder(self, *args, **kwargs):
-        targetfolder = Path(cfg["output_folders"]["target"])
-        open_folder(targetfolder)
+        open_folder(self.target_dir)
 
     def open_config_folder(self, *args, **kwargs):
         targetfolder = ConfigManager().get_config_dirpath()
