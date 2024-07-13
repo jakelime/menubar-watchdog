@@ -31,15 +31,6 @@ def check_and_move_file(filename: str):
     match = re.match(regex_str, fp.name)
     if match is not None:
         sp = fp.stem.split(" ")
-
-        # Version 0
-        # fp_date = datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
-        # fp_time = datetime.strptime(" ".join(sp[3:5]), "%I.%M.%S %p").strftime(
-        #     "%H%M%SH"
-        # )
-
-        # Version 1 - "Screenshot 2023-10-21 at 20.38.15.png"
-        # Version 2 - "Screenshot 2024-05-15 at 10.08.40 PM.png"
         fp_date = None
         fp_time = None
         fp_date = datetime.datetime.strptime(sp[1], "%Y-%m-%d").strftime("%yw%U-%m%d")
