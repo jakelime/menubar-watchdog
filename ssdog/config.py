@@ -1,18 +1,18 @@
 from pathlib import Path
-import os
+import platform
 import tomlkit as tmk
 from tomlkit import toml_file
 from tomlkit.toml_document import TOMLDocument
 
 try:
-    from utils import check_write_permission, LoggerManager
+    import utils
 except ImportError:
-    from .utils import check_write_permission, LoggerManager
+    from . import utils
 
 
 APP_NAME = "ssdog"
 
-lg = LoggerManager(APP_NAME).get_logger()
+lg = utils.LoggerManager(APP_NAME).get_logger()
 
 
 class ConfigManager:
@@ -23,10 +23,11 @@ class ConfigManager:
         if not self.config_filepath.is_file():
             self.write_toml_file(self.config_filepath)
         self.config = self.parse_config(self.config_filepath)
+        self.config = self.post_parse_config(self.config)
 
     def get_config_dirpath(self) -> Path:
         dirpath = Path(self.dirpath).expanduser()
-        check_write_permission(dirpath)
+        utils.check_write_permission(dirpath)
         dirpath = Path(self.dirpath).expanduser() / self.app_name
         if not dirpath.is_dir():
             dirpath.mkdir()
@@ -47,6 +48,20 @@ class ConfigManager:
         doc = tf.read()
         config = doc.unwrap()
         return config
+
+    @staticmethod
+    def post_parse_config(v: dict) -> dict:
+        os_version = int(platform.platform().split("-")[1].split(".")[0])
+        if os_version >= 14:
+            # macos Sonoma 14.5 has the same menubar regardless dark or light mode
+            v["app_icon_color"] = "black"
+
+        if v["app_icon_color"] == "auto":
+            if utils.is_macos_dark_mode():
+                v["app_icon_color"] = "white"
+            else:
+                v["app_icon_color"] = "black"
+        return v
 
     def reset(self) -> None:
         """
@@ -83,8 +98,8 @@ class ConfigToml:
         doc.add(tmk.nl())
         doc["watch_dirs"] = [r"~/Downloads"]
         doc["target_dir"] = r"~/Pictures/screenshots"
-        doc["app_icon_color"] = "white"
-        doc["app_icon_color"].comment("possible choices are [white, black]")
+        doc["app_icon_color"] = "auto"
+        doc["app_icon_color"].comment("possible choices are [white, black, auto]")
 
         wds = tmk.table()
         wds["file_suffix"] = "png"
@@ -99,6 +114,7 @@ def main():
     confm.reset()
     cfg = confm.config
     print(cfg)
+
 
 if __name__ == "__main__":
     main()

@@ -77,9 +77,6 @@ class CustomEventHandler(LoggingEventHandler):
     def on_deleted(self, event):
         pass
 
-    # def on_modified(self, event):
-    #     pass
-
 
 class Watcher:
     def __init__(self):

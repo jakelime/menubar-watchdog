@@ -1,3 +1,4 @@
 pyobjc
 rumps
 watchdog
+py2app
