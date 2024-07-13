@@ -51,10 +51,10 @@ class ConfigManager:
 
     @staticmethod
     def post_parse_config(v: dict) -> dict:
-        os_version = int(platform.platform().split("-")[1].split(".")[0])
-        if os_version >= 14:
-            # macos Sonoma 14.5 has the same menubar regardless dark or light mode
-            v["app_icon_color"] = "black"
+        # os_version = int(platform.platform().split("-")[1].split(".")[0])
+        # if os_version >= 14:
+        #     # macos Sonoma 14.5 has the same menubar regardless dark or light mode
+        #     v["app_icon_color"] = "black"
 
         if v["app_icon_color"] == "auto":
             if utils.is_macos_dark_mode():
