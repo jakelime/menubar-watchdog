@@ -40,6 +40,12 @@ App to automatically clean up screenshots captured on MacOS.
 - Move the `ss-watchdog.app` into your `/Applications` directory
 - You can now  add this app into `login items` during startup
 
+## Dependencies
+
+1. [rumps](https://github.com/jaredks/rumps)
+1. [watchdog](https://github.com/gorakhargosh/watchdog)
+1. [py2app](https://github.com/ronaldoussoren/py2app)
+
 ## Guide to build MacOS app
 
 Create `setup.py` for `py2app`.
