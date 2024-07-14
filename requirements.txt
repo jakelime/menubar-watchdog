@@ -1,3 +1,4 @@
+setuptools
 rumps
 py2app
 pyobjc

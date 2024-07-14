@@ -4,6 +4,7 @@ APP = ["src/ssdog.py"]
 DATA_FILES = [("", ["src/icons"])]
 OPTIONS = {
     "argv_emulation": True,
+    "iconfile": "src/icons/icon.icns",
     "plist": {
         "LSUIElement": True,
     },
