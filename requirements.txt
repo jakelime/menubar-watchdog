@@ -1,4 +1,5 @@
-pyobjc
 rumps
-watchdog
 py2app
+pyobjc
+tomlkit
+watchdog

@@ -1,18 +1,11 @@
 from pathlib import Path
-import platform
+
 import tomlkit as tmk
+import utils
 from tomlkit import toml_file
 from tomlkit.toml_document import TOMLDocument
 
-try:
-    import utils
-except ImportError:
-    from . import utils
-
-
 APP_NAME = "ssdog"
-
-lg = utils.LoggerManager(APP_NAME).get_logger()
 
 
 class ConfigManager:
@@ -89,17 +82,18 @@ class ConfigToml:
     def write_to_file(self) -> Path:
         tf = toml_file.TOMLFile(self.config_filepath)
         tf.write(self.doc)
-        lg.info(f"wrote config to {self.config_filepath}")
+        print(f"wrote config to {self.config_filepath}")
         return self.config_filepath
 
     def init_doc(self) -> TOMLDocument:
         doc = tmk.document()
         doc.add(tmk.comment("Configuration file for ssdog - Screenshot Watchdog"))
         doc.add(tmk.nl())
+        doc["debug"] = False
         doc["watch_dirs"] = [r"~/Downloads"]
         doc["target_dir"] = r"~/Pictures/screenshots"
         doc["app_icon_color"] = "auto"
-        doc["app_icon_color"].comment("possible choices are [white, black, auto]")
+        doc["app_icon_color"].comment("possible choices are [white, black, auto]")  # type: ignore
 
         wds = tmk.table()
         wds["file_suffix"] = "png"

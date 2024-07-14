@@ -4,45 +4,66 @@ App to automatically clean up screenshots captured on MacOS.
 
 ## Quickstart
 
-1. Standard python `venv` setup
+1. Setup environment, compile a `.app` app package using `py2app`
 
    ```shell
    python venv venv
    source ./venv/bin/activate
-   pip install -r requirements.txt
-   ## or pip install -r requirements-frozen.txt
-
-   ```
-
-1. Check the `py2app` settings in `setup.py`
-
-   ```python
-   from setuptools import setup
-
-    APP = ["ssdog.py"]
-    DATA_FILES = [("", ["images"])]
-    ...
-    setup(
-        app=APP,
-        data_files=DATA_FILES,
-        options={"py2app": OPTIONS},
-        setup_requires=["py2app"],
-    )
-
-   ```
-
-1. Compile the application
-
-   ```shell
+   pip install -r requirements.txt # to use latest libaries
+   ## or pip install -r requirements-frozen.txt # debug
    python setup.py py2app
    ```
 
 1. Run the application.
 
    - The app will appear in the menubar
-   - Any screenshots made will be automatically renamed and moved
-     to `target_dir`
-   - `open config folder` to open the folder that houses the configurations
-   - `open folder` opens the location where screenshots will be moved to
-   - Move the `application.app` into the `/Applications` directory
-   - You can choose to add this app into login items during startup
+
+## Usage guide
+
+### Problem statement
+
+- MacOS has a default screenshot capture shortcut: `cmd + shift + 4`
+
+  - The problem is that the images will be saved by default to Desktop
+  - This makes the desktop looks cluttered and messy over time, and it
+    will be difficult to find what you need.
+
+### Solution
+
+- Any screenshots made will be automatically renamed and moved
+   to `target_dir`
+- `OpenConfigFolder` allows user to change the configurations (`config.toml`)
+- `OpenFolder` opens the location where screenshots will be moved to
+
+### Tips
+
+- Move the `ss-watchdog.app` into your `/Applications` directory
+- You can now  add this app into `login items` during startup
+
+## Guide to build MacOS app
+
+Create `setup.py` for `py2app`.
+
+Example:
+
+```python
+from setuptools import setup
+
+APP = ["src/ssdog.py"]
+DATA_FILES = [("", ["src/icons"])]
+OPTIONS = {
+   "argv_emulation": True,
+   "plist": {
+      "LSUIElement": True,
+   },
+   "packages": ["rumps", "tomlkit"],
+}
+
+setup(
+   name="ss-watchdog",
+   app=APP,
+   data_files=DATA_FILES,
+   options={"py2app": OPTIONS},
+   setup_requires=["py2app"],
+)
+```

@@ -12,9 +12,21 @@ APP_NAME = "ssdog"
 
 
 class LoggerManager:
-    def __init__(self, app_name: str = ""):
+    def __init__(
+        self,
+        app_name: str = "",
+        logfile_backupCount: int = 5,
+        logfile_maxBytes: int = 2_097_152,
+        default_level=logging.WARNING,
+        debug_mode: bool = False,
+    ):
         if not app_name:
             app_name = __name__
+        self.default_level = default_level
+        if debug_mode:
+            self.default_level = logging.DEBUG
+        self.logfile_backupCount = logfile_backupCount
+        self.logfile_maxBytes = logfile_maxBytes
         self.app_name = app_name
         self.logger_name = app_name
         self.logger = logging.getLogger(self.app_name)
@@ -24,15 +36,17 @@ class LoggerManager:
 
     def init_logger(self, logger):
         logger_filepath = self.set_log_filepath()
-        logger.setLevel(logging.INFO)
+        logger.setLevel(self.default_level)
         formatter = logging.Formatter("%(asctime)s-%(levelname)s: %(message)s")
         fhandler = RotatingFileHandler(
-            filename=logger_filepath, maxBytes=2_097_152, backupCount=10
+            filename=logger_filepath,
+            maxBytes=self.logfile_maxBytes,
+            backupCount=self.logfile_backupCount,
         )
         fhandler.setFormatter(formatter)
-        fhandler.setLevel(logging.INFO)
+        fhandler.setLevel(self.default_level)
         chandler = logging.StreamHandler()
-        chandler.setLevel(logging.INFO)
+        chandler.setLevel(self.default_level)
         chandler.setFormatter(formatter)
         logger.addHandler(fhandler)
         logger.addHandler(chandler)
@@ -80,9 +94,6 @@ class LoggerManager:
         return logger_filepath
 
 
-lg = LoggerManager(APP_NAME).get_logger()
-
-
 def check_write_permission(directory_path):
     if not os.access(directory_path, os.W_OK):
         raise OSError(f"directory is not writeable - {directory_path=}")
@@ -105,21 +116,17 @@ def function_timer(func):
         result = func(*args, **kwargs)
         end_time = timeit.default_timer()
         elapsed_time = end_time - start_time
-        lg.info(f"fn('{func.__name__}') took {elapsed_time:.4f} seconds.")
+        print(f"fn('{func.__name__}') took {elapsed_time:.4f} seconds.")
         return result
 
     return wrapper
 
 
-def cleanup_folder(folderpath: Path | None = None, clean_all=False):
-    if folderpath is None:
-        targetfolder = Path(cfg["output_folders"]["target"])
-    else:
-        targetfolder = folderpath
+def cleanup_folder(logger, folderpath: Path, clean_all=False):
     wknumber_today = datetime.datetime.today().strftime("%yw%U")
-    datefolder = targetfolder / f"archived-{wknumber_today}"
+    datefolder = folderpath / f"archived-{wknumber_today}"
 
-    for fp in targetfolder.glob("*.png"):
+    for fp in folderpath.glob("*.png"):
         if wknumber_today in fp.name and not clean_all:
             continue
 
@@ -127,15 +134,15 @@ def cleanup_folder(folderpath: Path | None = None, clean_all=False):
         datefolder = fp.parent / f"archived-{fp_wknumber}"
         if not datefolder.is_dir():
             datefolder.mkdir(parents=True, exist_ok=True)
-            lg.warning(f"created {datefolder=}")
+            logger.warning(f"created {datefolder=}")
 
         dst = datefolder / fp.name
         shutil.copyfile(src=fp, dst=dst)
         os.remove(fp)
-        lg.warning(f"moved {fp.name} to //{dst.parent.name}/{dst.name}")
+        logger.warning(f"moved {fp.name} to //{dst.parent.name}/{dst.name}")
 
 
-def open_folder(path: Path | str):
+def open_folder(logger, path: Path | str):
     if not isinstance(path, Path):
         path = Path(path)
     if path.is_dir():
@@ -147,7 +154,7 @@ def open_folder(path: Path | str):
             subprocess.Popen(["xdg-open", path])
     else:
         raise Exception(f"invalid {path=}")
-    lg.info(f"Open folder success //{path.name}")
+    logger.info(f"Open folder success //{path.name}")
 
 
 def is_macos_dark_mode() -> bool:
@@ -157,11 +164,3 @@ def is_macos_dark_mode() -> bool:
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
     )
     return bool(p.communicate()[0])
-
-
-def main():
-    lg.info("success!")
-
-
-if __name__ == "__main__":
-    main()

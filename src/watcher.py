@@ -5,25 +5,18 @@ import shutil
 import time
 from pathlib import Path
 
+from config import ConfigManager
+from utils import LoggerManager, cleanup_folder
 from watchdog.events import LoggingEventHandler
 from watchdog.observers import Observer
 
-try:
-    from utils import LoggerManager, cleanup_folder
-
-    from config import ConfigManager
-except ImportError:
-    from .config import ConfigManager
-    from .utils import LoggerManager, cleanup_folder
-
-
 APP_NAME = "ssdog"
 
-lg = LoggerManager(APP_NAME).get_logger()
+cfg = ConfigManager().config
+lg = LoggerManager(APP_NAME, debug_mode=cfg["debug"]).get_logger()
 
 
 def check_and_move_file(filename: str):
-    cfg = ConfigManager().config
     regex_str = re.compile(cfg["watchdog_settings"]["regex_compile_string"])
     fp = Path(filename)
     if not fp.is_file():
@@ -52,7 +45,7 @@ def check_and_move_file(filename: str):
             pass
 
         try:
-            cleanup_folder(targetfolder, clean_all=False)
+            cleanup_folder(lg, targetfolder, clean_all=False)
         except Exception as e:
             lg.error(e)
 
@@ -80,7 +73,6 @@ class CustomEventHandler(LoggingEventHandler):
 
 class Watcher:
     def __init__(self):
-        cfg = ConfigManager().config
         self.event_handler = CustomEventHandler(logger=lg)
         self.observer = Observer()
         self.watched_paths = []

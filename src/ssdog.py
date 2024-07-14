@@ -3,22 +3,15 @@ from pathlib import Path
 from threading import Event, Thread
 
 import rumps
+from config import ConfigManager
+from utils import LoggerManager, cleanup_folder, open_folder
 from watcher import Watcher
-
-try:
-    from utils import LoggerManager, cleanup_folder, open_folder
-
-    from config import ConfigManager
-except ImportError:
-    from .config import ConfigManager
-    from .utils import LoggerManager, cleanup_folder, open_folder
-
 
 APP_NAME = "ssdog"
 VAR_RUN = True
 
 cfg = ConfigManager().config
-lg = LoggerManager(APP_NAME).getLogger()
+lg = LoggerManager(APP_NAME, debug_mode=cfg["debug"]).get_logger()
 
 
 class StatusBarApp(rumps.App):
@@ -33,27 +26,29 @@ class StatusBarApp(rumps.App):
         sender.state = not sender.state
         if sender.state == 1:
             bool_value = True
-            rumps.debug_mode(True)
-            lg.info(f"switched debug={bool_value}")
+            for h in lg.handlers:
+                h.setLevel("DEBUG")
         else:
             bool_value = False
-            rumps.debug_mode(bool_value)
-            lg.info(f"switched debug={bool_value}")
+            for h in lg.handlers:
+                h.setLevel("WARNING")
+        rumps.debug_mode(bool_value)
+        lg.critical(f"switched debug={bool_value}")
 
     def cleanup_folder(self, *args, **kwargs):
-        cleanup_folder(self.target_dir, clean_all=True)
+        cleanup_folder(lg, self.target_dir, clean_all=True)
 
     def open_folder(self, *args, **kwargs):
-        open_folder(self.target_dir)
+        open_folder(lg, self.target_dir)
 
     def open_config_folder(self, *args, **kwargs):
         targetfolder = ConfigManager().get_config_dirpath()
-        open_folder(targetfolder)
+        open_folder(lg, targetfolder)
 
     def toggle_watchdog(self, sender=None):
         if sender is None:
             self.start_watchdog()
-            lg.critical(f"Started {APP_NAME}")
+            lg.debug(f"Started {APP_NAME}")
             return
 
         sender.state = not sender.state
@@ -62,7 +57,7 @@ class StatusBarApp(rumps.App):
             lg.critical(f"Stopped {APP_NAME}")
         else:
             self.start_watchdog()
-            lg.critical(f"Started {APP_NAME}")
+            lg.debug(f"Started {APP_NAME}")
 
     def watchdog(self, *args, **kwargs):
         wt = Watcher()
@@ -99,24 +94,27 @@ class StatusBarApp(rumps.App):
 def get_menubar_icon() -> str:
     match cfg["app_icon_color"].lower():
         case "black":
-            menu_icon_img = "images/icon-black.icns"
+            menu_icon_img = "icons/icon-black.icns"
         case "white":
-            menu_icon_img = "images/icon-white.icns"
+            menu_icon_img = "icons/icon-white.icns"
         case _:
-            menu_icon_img = "images/icon-white.icns"
+            menu_icon_img = "icons/icon-white.icns"
     return menu_icon_img
 
 
 if __name__ == "__main__":
+    lg.debug(f"initializing {APP_NAME}...")
     app = StatusBarApp(APP_NAME, icon=get_menubar_icon())
+    lg.debug("setting menu items...")
     app.menu = [
         rumps.MenuItem("Watchdog App"),  # can specify an icon to be placed near text
         rumps.MenuItem("OpenConfigFolder", callback=app.open_config_folder),
-        rumps.MenuItem("Debug", callback=app.debug_toggle_switch),
+        # rumps.MenuItem("Debug", callback=app.debug_toggle_switch),
         None,  # None functions as a separator in your menu
         rumps.MenuItem("Pause", callback=app.toggle_watchdog),
         rumps.MenuItem("Cleanup", callback=app.cleanup_folder),
         rumps.MenuItem("OpenFolder", callback=app.open_folder),
         None,
     ]
+    lg.debug("running app...")
     app.run()
