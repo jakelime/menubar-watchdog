@@ -46,6 +46,10 @@ App to automatically clean up screenshots captured on MacOS.
 1. [watchdog](https://github.com/gorakhargosh/watchdog)
 1. [py2app](https://github.com/ronaldoussoren/py2app)
 
+## Tests
+
+Tested using `Python 3.12.3` running on `macOS-14.5-arm64-arm-64bit`
+
 ## Guide to build MacOS app
 
 Create `setup.py` for `py2app`.
