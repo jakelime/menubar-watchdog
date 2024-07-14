@@ -22,11 +22,11 @@ App to automatically clean up screenshots captured on MacOS.
 
 ### Problem statement
 
-- MacOS has a default screenshot capture shortcut: `cmd + shift + 4`
+- MacOS has a default screenshot capture shortcut: `Cmd + Shift + 4`
 
   - The problem is that the images will be saved by default to Desktop
-  - This makes the desktop looks cluttered and messy over time, and it
-    will be difficult to find what you need.
+  - This makes the desktop cluttered and messy over time, and often difficult
+    to find what you need.
 
 ### Solution
 
