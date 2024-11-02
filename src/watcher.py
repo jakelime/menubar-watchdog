@@ -37,6 +37,12 @@ def check_and_move_file(filename: str):
 
         targetfolder = Path(cfg["target_dir"]).expanduser()
         new_fp = targetfolder / f"ss-{fp_date}-{fp_time}{fp.suffix}"
+        i = 1
+        while new_fp.is_file():
+            new_fp = targetfolder / f"ss-{fp_date}-{fp_time}_{i}{fp.suffix}"
+            i += 1
+            if i > 99:
+                raise RuntimeError(f"too many files of similar name - {new_fp=}")
         try:
             shutil.copyfile(src=fp, dst=new_fp)
             os.remove(fp)
