@@ -18,6 +18,10 @@ App to automatically clean up screenshots captured on MacOS.
 
    - The app will appear in the menubar
 
+## DevStart
+
+1. `python src/ssdog.py‹`
+
 ## Usage guide
 
 ### Problem statement
